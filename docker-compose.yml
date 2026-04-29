@@ -1,0 +1,69 @@
+services:
+
+  # ─────────────────────────────────────────────────────────────────
+  # BASE DE DATOS — PostgreSQL
+  # Se levanta primero. El backend espera a que esté "healthy".
+  # ─────────────────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: pos_db
+    environment:
+      POSTGRES_DB: pos_db
+      POSTGRES_USER: pos_user
+      POSTGRES_PASSWORD: pos_password
+    volumes:
+      # Los datos persisten en un volumen aunque el contenedor se borre
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      # Exponer el puerto para poder conectarse con DBeaver/pgAdmin desde el host
+      - "5432:5432"
+    healthcheck:
+      # Espera hasta que PostgreSQL acepte conexiones antes de iniciar el backend
+      test: ["CMD-SHELL", "pg_isready -U pos_user -d pos_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─────────────────────────────────────────────────────────────────
+  # BACKEND — Spring Boot
+  # Se construye desde ./backend/Dockerfile
+  # ─────────────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: pos_backend
+    depends_on:
+      db:
+        # Solo arranca cuando PostgreSQL pase el healthcheck
+        condition: service_healthy
+    environment:
+      # Sobreescribimos las variables del Dockerfile con los valores reales.
+      # "db" es el nombre del servicio de arriba, Docker resuelve el DNS automáticamente.
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/pos_db
+      SPRING_DATASOURCE_USERNAME: pos_user
+      SPRING_DATASOURCE_PASSWORD: pos_password
+      JWT_SECRET: pos-system-super-secret-key-2024-must-be-256-bits-long-enough
+      JWT_EXPIRATION: 86400000
+    ports:
+      - "8080:8080"
+
+  # ─────────────────────────────────────────────────────────────────
+  # FRONTEND — React + Nginx
+  # Se construye desde ./frontend/Dockerfile
+  # ─────────────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: pos_frontend
+    depends_on:
+      - backend
+    ports:
+      # La app queda disponible en http://localhost
+      - "80:80"
+
+# Volumen con nombre para que los datos de PostgreSQL sobrevivan
+# al borrar y recrear los contenedores
+volumes:
+  postgres_data:
