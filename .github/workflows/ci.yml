@@ -74,14 +74,58 @@ jobs:
           retention-days: 7
 
   # ─────────────────────────────────────────────────────────────────
-  # JOB 3: Resumen — Solo corre si ambos jobs pasaron
+  # JOB 3: Docker — Construir imágenes y subir a ghcr.io (solo en main)
+  # ─────────────────────────────────────────────────────────────────
+  docker:
+    name: Docker Build & Push
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    if: success()
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Login a GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build y push imagen backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+          tags: ghcr.io/${{ github.repository_owner }}/pos-backend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build y push imagen frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+          tags: ghcr.io/${{ github.repository_owner }}/pos-frontend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ─────────────────────────────────────────────────────────────────
+  # JOB 4: Resumen — Solo corre si todos los jobs pasaron
   # ─────────────────────────────────────────────────────────────────
   ci-success:
     name: CI Passed
     runs-on: ubuntu-latest
-    needs: [backend, frontend]
+    needs: [backend, frontend, docker]
     if: success()
 
     steps:
       - name: Todo OK
-        run: echo "✅ Backend tests y Frontend build completados exitosamente."
+        run: echo "✅ Backend tests, Frontend build y Docker build completados exitosamente."
