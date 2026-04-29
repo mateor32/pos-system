@@ -387,7 +387,8 @@ const AccountingPage: React.FC = () => {
                   createExpense.mutate({
                     description: form.description,
                     amount: parseFloat(form.amount),
-                    category: form.category,
+                    category:
+                      form.category as import("../types").ExpenseCategory,
                     notes: form.notes || undefined,
                   })
                 }

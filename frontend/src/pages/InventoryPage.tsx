@@ -139,14 +139,14 @@ const InventoryPage: React.FC = () => {
   const handleSubmit = () => {
     const data = {
       name: form.name,
-      barcode: form.barcode || null,
-      description: form.description || null,
+      barcode: form.barcode || undefined,
+      description: form.description || undefined,
       costPrice: parseFloat(form.costPrice),
       salePrice: parseFloat(form.salePrice),
       stock: parseInt(form.stock) || 0,
       minStock: parseInt(form.minStock) || 5,
-      imageUrl: form.imageUrl || null,
-      categoryId: form.categoryId ? parseInt(form.categoryId) : null,
+      imageUrl: form.imageUrl || undefined,
+      categoryId: form.categoryId ? parseInt(form.categoryId) : undefined,
       active: form.active,
     };
     if (editProduct) {

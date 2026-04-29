@@ -178,7 +178,7 @@ const POSPage: React.FC = () => {
         <div className="px-4 py-3.5 border-b border-white/5 flex items-center gap-2">
           <ShoppingCart size={16} className="text-indigo-400" />
           <span className="text-sm font-semibold text-slate-200">Carrito</span>
-          <Badge color="indigo" className="ml-auto">
+          <Badge color="purple" className="ml-auto">
             {items.length}
           </Badge>
         </div>
