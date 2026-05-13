@@ -51,7 +51,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Value("${ALLOWED_ORIGINS:http://localhost:5173}")
+    @Value("${ALLOWED_ORIGINS:http://localhost:5173,https://pos-system-chi-beryl.vercel.app}")
     private String allowedOrigins;
 
     @Bean
