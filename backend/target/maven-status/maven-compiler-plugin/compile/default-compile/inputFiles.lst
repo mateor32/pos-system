@@ -29,6 +29,7 @@ C:\Users\mater\Desktop\pos\backend\src\main\java\com\pos\exception\GlobalExcepti
 C:\Users\mater\Desktop\pos\backend\src\main\java\com\pos\entity\SaleItem.java
 C:\Users\mater\Desktop\pos\backend\src\main\java\com\pos\repository\ExpenseRepository.java
 C:\Users\mater\Desktop\pos\backend\src\main\java\com\pos\repository\UserRepository.java
+C:\Users\mater\Desktop\pos\backend\src\main\java\com\pos\config\CorsConfig.java
 C:\Users\mater\Desktop\pos\backend\src\main\java\com\pos\entity\User.java
 C:\Users\mater\Desktop\pos\backend\src\main\java\com\pos\dto\RegisterRequest.java
 C:\Users\mater\Desktop\pos\backend\src\main\java\com\pos\service\ExpenseService.java
